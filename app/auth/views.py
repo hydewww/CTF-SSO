@@ -11,21 +11,27 @@ from .forms import LoginForm, RegistrationForm
 def login():
     referer = request.args.get('referer', None)
     form = LoginForm()
+    if current_user.is_authenticated:
+        if referer is not None:
+            referer = referer.strip() + "?ticket=" + _makeTicket(current_user)
+        else:
+            referer = url_for('main.index')
+        return redirect(referer)
     if form.validate_on_submit():
         user = User.query.filter_by(name=form.username.data).first()
         if user is not None and user.verify_password(form.password.data):
-            login_user(user, form.remember_me.data)
+            login_user(user)
             if referer is not None:
-                referer = referer.strip() + "?ticket=" + _makeTicket()
+                referer = referer.strip() + "?ticket=" + _makeTicket(user)
             else:
                 referer = url_for('main.index')
             return redirect(referer)
         flash('Invalid username or password.')
-    return render_template('auth/login.html', form=form, **dict(referer=referer))
+    return render_template('auth/login.html', form=form, **dict(referer=referer), refer=referer)
 
 
-def _makeTicket():
-    return current_user.name
+def _makeTicket(user):
+    return user.name
 
 
 @auth.route('/logout')
@@ -38,6 +44,7 @@ def logout():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
+    referer = request.args.get('referer', None)
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(name=form.username.data,
@@ -47,5 +54,8 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash('Register Success.')
-        return redirect(url_for('auth.login'))
+        url = url_for('auth.login')
+        if referer is not None:
+            url = url + "?referer=" + referer.strip()
+        return redirect(url)
     return render_template('auth/register.html', form=form)
