@@ -6,4 +6,4 @@
 
 # 项目
 
-1. [CTF-Attack&Defense (Branch:SSO)][(https://github.com/hydewww/CTF-Attack-Defense/tree/SSO)] 
+1. [CTF-Attack&Defense (Branch:SSO)](https://github.com/hydewww/CTF-Attack-Defense/tree/SSO)
