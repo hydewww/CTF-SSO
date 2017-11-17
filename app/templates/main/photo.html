@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    {{ form.photo }}
+    {% for error in form.photo.errors %}
+        <span style="color: red;">{{ error }}</span>
+    {% endfor %}
+    {{ form.submit }}
+</form>
+<br>
+<img class="img img-responsive img-raised" src="{{ file_url }}" onclick="getElementById('photo').click()" title="Change photo" alt="Change photo" style="width:160px;height:160px;">
+{% endblock %}

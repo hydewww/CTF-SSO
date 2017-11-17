@@ -3,6 +3,8 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Integ
 from wtforms.validators import Required, Length, Regexp, EqualTo
 from wtforms import ValidationError
 from ..models import User
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+from .. import photos
 
 
 class LoginForm(FlaskForm):
