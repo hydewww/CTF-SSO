@@ -13,7 +13,7 @@ def login():
     form = LoginForm()
     if current_user.is_authenticated:
         if referer is not None:
-            referer = referer.strip() + "?ticket=" + _makeTicket(current_user)
+            referer = referer.strip() + "?token=" + _makeToken(current_user)
         else:
             referer = url_for('main.index')
         return redirect(referer)
@@ -22,7 +22,7 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
             if referer is not None:
-                referer = referer.strip() + "?ticket=" + _makeTicket(user)
+                referer = referer.strip() + "?token=" + _makeToken(user)
             else:
                 referer = url_for('main.index')
             return redirect(referer)
@@ -30,7 +30,7 @@ def login():
     return render_template('auth/login.html', form=form, **dict(referer=referer), refer=referer)
 
 
-def _makeTicket(user):
+def _makeToken(user):
     return user.name
 
 
