@@ -1,10 +1,10 @@
-from flask import render_template, redirect, request, url_for, flash, session
-from flask_login import login_user, logout_user, login_required, \
-    current_user
+from flask import render_template, redirect, request, url_for, flash, session, current_app
+from flask_login import login_user, logout_user, login_required, current_user
 from . import auth
 from .. import db
 from ..models import User
 from .forms import LoginForm, RegistrationForm
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -13,7 +13,7 @@ def login():
     form = LoginForm()
     if current_user.is_authenticated:
         if referer is not None:
-            referer = referer.strip() + "?token=" + _makeToken(current_user)
+            referer = referer.strip() + "/" + _makeToken(current_user)
         else:
             referer = url_for('main.index')
         return redirect(referer)
@@ -22,7 +22,7 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
             if referer is not None:
-                referer = referer.strip() + "?token=" + _makeToken(user)
+                referer = referer.strip() + "/" + _makeToken(user)
             else:
                 referer = url_for('main.index')
             return redirect(referer)
@@ -31,7 +31,9 @@ def login():
 
 
 def _makeToken(user):
-    return user.name
+    s = Serializer(current_app.config['SECRET_KEY'], 60)
+    token = s.dumps({'id' : user.id})
+    return token.decode()
 
 
 @auth.route('/logout')
